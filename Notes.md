@@ -27,3 +27,14 @@ npx tsc --init
 ```
 
 ##### Thoughts: `Maybe should have just used bun!`
+
+### 2. Setup Redis
+
+```sh
+docker run --name my-redis -p 6379:6379 -d redis
+```
+
+```sh
+npm i express redis zod
+npm i -D @types/express
+```
