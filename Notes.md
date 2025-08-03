@@ -20,7 +20,7 @@ npx tsc --init
     "clean": "rm -rf dist/",
     "build": "npm run clean && tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx --watch src/index.ts"
   },
   // ...other options
 }

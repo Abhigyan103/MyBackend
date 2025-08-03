@@ -1,3 +1,1 @@
-import os from "os";
-
-console.log(os.homedir());
+console.log("Hello, World! This is the entry point of the application.");
