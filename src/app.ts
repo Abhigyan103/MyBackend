@@ -1,6 +1,5 @@
 import express, { type Request, type Response } from 'express';
-import { connectToRedis, disconnectFromRedis } from './config/redis.config.js';
-import { env } from './config/server.config.js';
+import { env, connectToRedis, disconnectFromRedis, logger } from './config/index.js';
 
 // Initialize Express app
 const app = express();
@@ -13,12 +12,12 @@ app.get('/', async (req: Request, res: Response) => {
     const hits = await redisClient.incr('page_hits');
     res.send(`This page has been viewed ${hits} times.`);
   } catch (error) {
-    console.error('Error with Redis:', error);
+    logger.error('Error with Redis:', error);
     res.status(500).send('An error occurred.');
   }
 });
 
 // Start the Express server
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  logger.info(`Server is running at http://localhost:${PORT}`);
 });

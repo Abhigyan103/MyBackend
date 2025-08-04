@@ -1,7 +1,7 @@
 import { createClient, type RedisClientType } from 'redis';
-import { env } from './server.config.js'; // Assuming you have an env.config.ts file
+import { env } from './server.config.js';
+import { logger } from './logger.config.js';
 
-// Define the Redis client type for better TypeScript support
 let redisClient: RedisClientType;
 
 /**
@@ -13,7 +13,7 @@ let redisClient: RedisClientType;
  */
 export const connectToRedis = async (): Promise<RedisClientType> => {
   if (redisClient && redisClient.isReady) {
-    console.log('Redis client is already connected.');
+    logger.info('Redis client is already connected.');
     return redisClient;
   }
 
@@ -26,19 +26,19 @@ export const connectToRedis = async (): Promise<RedisClientType> => {
     redisClient = createClient(clientOptions);
 
     redisClient.on('connect', () => {
-      console.log('Redis client is connecting...');
+      logger.info('Redis client is connecting...');
     });
     
     redisClient.on('ready', () => {
-      console.log('Redis client connected successfully!');
+      logger.info('Redis client connected successfully!');
     });
 
     redisClient.on('error', (err) => {
-      console.error('Redis connection error:', err);
+      logger.error('Redis connection error:', err);
     });
 
     redisClient.on('end', () => {
-      console.warn('Redis client connection has been closed.');
+      logger.warn('Redis client connection has been closed.');
     });
 
     // Initiate the connection to Redis
@@ -46,7 +46,7 @@ export const connectToRedis = async (): Promise<RedisClientType> => {
     
     return redisClient;
   } catch (error) {
-    console.error('Failed to initialize or connect to Redis client:', error);
+    logger.error('Failed to initialize or connect to Redis client:', error);
     // Propagate the error to the caller
     throw new Error('Could not connect to Redis.');
   }
@@ -59,6 +59,6 @@ export const connectToRedis = async (): Promise<RedisClientType> => {
 export const disconnectFromRedis = async (): Promise<void> => {
   if (redisClient && redisClient.isReady) {
     await redisClient.quit();
-    console.log('Redis client disconnected gracefully.');
+    logger.info('Redis client disconnected gracefully.');
   }
 };

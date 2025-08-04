@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+/*
+  * This file should NOT use logger, as it will create a circular dependency.
+*/
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3000),
