@@ -1,28 +1,61 @@
-import { z } from 'zod';
+import { z } from "zod";
+import ms from "ms";
 
 /*
-  * This file should NOT use logger, as it will create a circular dependency.
-*/
+ * This file should NOT use logger, as it will create a circular dependency.
+ */
+
+/**
+ * Creates a Zod schema for a duration value.
+ * The schema accepts either a string (e.g., "7d", "1h") or a number (milliseconds).
+ * The default value is converted to milliseconds and used if no value is provided.
+ *
+ * @param defaultValue The default duration value (string or number).
+ * @returns A Zod schema for the duration.
+ */
+
+export function durationSchema(defaultValue: string | number) {
+  const defaultMs = // @ts-ignore: ms() returns number | undefined, but we handle errors below
+    typeof defaultValue === "number" ? defaultValue : ms(defaultValue);
+  if (typeof defaultMs !== "number" || defaultMs <= 0) {
+    throw new Error("Invalid default duration value.");
+  }
+
+  return z.preprocess((val) => {
+    if (typeof val === "string") {
+      // @ts-ignore: ms() returns number | undefined, but we handle errors below
+      const duration = ms(val);
+      if (typeof duration !== "number" || duration <= 0) {
+        throw new Error(
+          'Value must be a valid duration string (e.g., "7d", "1h")'
+        );
+      }
+      return duration;
+    } else if (typeof val === "number" && val > 0) {
+      return val;
+    }
+    throw new Error('Value must be a string like "7d" or a positive number.');
+  }, z.number().default(defaultMs));
+}
+
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
   PORT: z.coerce.number().default(3000),
-
-  // Redis Configuration
-  REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
-
-  // Other configurations (e.g., database, external services)
+  REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   // DATABASE_URL: z.string().url('DATABASE_URL must be a valid URL'),
-  // JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
+  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  REFRESH_TOKEN_SECRET: z.string().min(1, "REFRESH_TOKEN_SECRET is required"),
+  REFRESH_TOKEN_EXPIRY: durationSchema("7d"),
+  JWT_EXPIRY: durationSchema("15m"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  console.error(
-    '❌ Invalid environment variables:',
-    parsedEnv.error.format()
-  );
-  throw new Error('Invalid environment variables. Check your .env file.');
+  console.error("❌ Invalid environment variables:", parsedEnv.error.format());
+  throw new Error("Invalid environment variables. Check your .env file.");
 }
 
 /**

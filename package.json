@@ -14,14 +14,25 @@
     "dev": "tsx --watch --env-file=.env src/app.ts"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.0.5",
+    "supertest": "^7.1.4",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
+    "http-status": "^2.1.0",
+    "jsonwebtoken": "^9.0.2",
     "redis": "^5.7.0",
+    "uuid": "^11.1.0",
     "winston": "^3.17.0",
     "zod": "^4.0.14"
   }

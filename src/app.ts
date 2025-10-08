@@ -1,20 +1,30 @@
-import express, { type Request, type Response } from 'express';
-import { env, connectToRedis, disconnectFromRedis, logger } from './config/index.js';
-
+import express, { type Request, type Response } from "express";
+import cors from "cors";
+import { env, logger } from "./config/index.js";
+import v1Router from "./api/v1/routes/index.js";
+import cookieParser from "cookie-parser";
 // Initialize Express app
 const app = express();
 const PORT = env.PORT;
 
-// Define a simple route to increment and display a hit counter
-app.get('/', async (req: Request, res: Response) => {
-  try {
-    const redisClient = await connectToRedis();
-    const hits = await redisClient.incr('page_hits');
-    res.send(`This page has been viewed ${hits} times.`);
-  } catch (error) {
-    logger.error('Error with Redis:', error);
-    res.status(500).send('An error occurred.');
-  }
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/v1", v1Router);
+app.post("/health", (req: Request, res: Response) => {
+  const { status } = req.body;
+  logger.info(`Health: ${status}`);
+  res.sendStatus(200);
 });
 
 // Start the Express server
