@@ -23,6 +23,10 @@ export function durationSchema(defaultValue: string | number) {
 
   return z.preprocess((val) => {
     if (typeof val === "string") {
+      const valNum = Number(val); // Check if it's a numeric string, i.e, the number of seconds. we don't want to convert to milliseconds here
+      if (!isNaN(valNum) && valNum > 0) {
+        return valNum; // If it's a valid positive number string, return as number
+      }
       // @ts-ignore: ms() returns number | undefined, but we handle errors below
       const duration = ms(val);
       if (typeof duration !== "number" || duration <= 0) {
@@ -30,7 +34,7 @@ export function durationSchema(defaultValue: string | number) {
           'Value must be a valid duration string (e.g., "7d", "1h")'
         );
       }
-      return duration;
+      return duration / 1000; // Convert to seconds
     } else if (typeof val === "number" && val > 0) {
       return val;
     }
