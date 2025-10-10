@@ -8,7 +8,6 @@
 import { env } from "./server.config.js";
 import { logger } from "./logger.config.js";
 import { connectToRedis, disconnectFromRedis } from "./redis.config.js";
-import { prismaClient, type PrismaTypes } from "./prisma.config.js";
 
 /**
  * Re-export all configurations.
@@ -17,11 +16,4 @@ import { prismaClient, type PrismaTypes } from "./prisma.config.js";
  *
  * `import { env, logger, connectToRedis } from '../config';`
  */
-export {
-  env,
-  logger,
-  connectToRedis,
-  disconnectFromRedis,
-  prismaClient,
-  type PrismaTypes,
-};
+export { env, logger, connectToRedis, disconnectFromRedis };

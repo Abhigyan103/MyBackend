@@ -21,13 +21,11 @@
     "@types/node": "^24.1.0",
     "@types/supertest": "^6.0.3",
     "jest": "^30.0.5",
-    "prisma": "^6.17.0",
     "supertest": "^7.1.4",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@prisma/client": "^6.17.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
