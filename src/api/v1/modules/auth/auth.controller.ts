@@ -5,13 +5,13 @@ import {
   signToken,
   verifyRefreshToken,
   type JwtPayload,
-} from "../../../utils/jwt.js";
+} from "../../../../utils/jwt.js";
 import {
   createRefreshToken,
   validateRefreshToken,
-} from "../../../cache/refreshToken.cache.js";
-import { env, logger } from "../../../config/index.js";
-import { authenticateUser } from "../../../repositories/user.repository.js";
+} from "../../../../cache/refreshToken.cache.js";
+import { env, logger } from "../../../../config/index.js";
+import { authenticateUser } from "../user/user.repository.js";
 
 export const login = async (req: Request, res: Response) => {
   if (!req.body || !req.body.email || !req.body.password) {

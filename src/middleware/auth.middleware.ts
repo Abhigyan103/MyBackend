@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import status from "http-status";
 
-import { verifyToken, type JwtPayload } from "../utils/jwt.js";
-import { logger } from "../config/index.js";
-import { Role } from "../types/roles.js";
+import { verifyToken, type JwtPayload } from "@/utils/jwt.js";
+import { logger } from "@/config/index.js";
+import { Role } from "@/types/roles.js";
 
 // Extend the Express Request type to include a user property
 declare global {

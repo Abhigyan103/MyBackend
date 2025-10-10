@@ -1,10 +1,10 @@
 // src/cache/refreshToken.cache.ts
-import { connectToRedis, env } from "../config/index.js";
+import { connectToRedis, env } from "@/config/index.js";
 import {
   signRefreshToken,
   verifyRefreshToken,
   type JwtPayload,
-} from "../utils/jwt.js";
+} from "@/utils/jwt.js";
 
 const redisClient = await connectToRedis();
 

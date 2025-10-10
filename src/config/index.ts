@@ -5,9 +5,10 @@
  * parts of the application and keeps the codebase clean and organized.
  */
 
-import { env } from './server.config.js';
-import { logger } from './logger.config.js';
-import { connectToRedis, disconnectFromRedis } from './redis.config.js';
+import { env } from "./server.config.js";
+import { logger } from "./logger.config.js";
+import { connectToRedis, disconnectFromRedis } from "./redis.config.js";
+import { prismaClient, type PrismaTypes } from "./prisma.config.js";
 
 /**
  * Re-export all configurations.
@@ -20,5 +21,7 @@ export {
   env,
   logger,
   connectToRedis,
-  disconnectFromRedis
+  disconnectFromRedis,
+  prismaClient,
+  type PrismaTypes,
 };

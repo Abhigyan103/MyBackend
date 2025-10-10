@@ -4,6 +4,11 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
+    // Import Settings
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     // Environment Settings
     "module": "nodenext",
     "target": "esnext",

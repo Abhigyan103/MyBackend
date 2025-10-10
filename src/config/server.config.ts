@@ -63,6 +63,6 @@ if (!parsedEnv.success) {
 }
 
 /**
- * Environment variables parsed and validated using zod.
+ * Environment variables parsed and validated.
  */
 export const env = parsedEnv.data;

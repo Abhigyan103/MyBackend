@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from "express";
 import cors from "cors";
 import { env, logger } from "./config/index.js";
-import v1Router from "./api/v1/routes/index.js";
+import v1Router from "./api/v1/routes.js";
 import cookieParser from "cookie-parser";
 import { requestLogger } from "./middleware/logger.js";
 // Initialize Express app
