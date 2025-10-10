@@ -1,5 +1,5 @@
-import winston from 'winston';
-import { env } from './server.config.js';
+import winston from "winston";
+import { env } from "./server.config.js";
 
 const logLevels = {
   error: 0,
@@ -12,22 +12,32 @@ const logLevels = {
 };
 
 const colors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  http: 'magenta',
-  verbose: 'cyan',
-  debug: 'white',
-  silly: 'gray',
+  error: "red",
+  warn: "yellow",
+  info: "green",
+  http: "magenta",
+  verbose: "cyan",
+  debug: "white",
+  silly: "gray",
 };
 
 winston.addColors(colors);
 
 const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.printf(
-    (info) => `${info.timestamp} [${info.level}]: ${info.message}`
-  )
+  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+
+  winston.format.printf((info) => {
+    const { level, message, timestamp, ...dataDump } = info;
+
+    const data = JSON.stringify({
+      timestamp: timestamp,
+      ...dataDump,
+    });
+    let log = `[${info.level}]: ${info.message} `;
+    const colorizer = winston.format.colorize();
+    log += colorizer.colorize("silly", data);
+    return log;
+  })
 );
 
 /**
@@ -38,16 +48,14 @@ const transports = [
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize({ all: true }),
-      winston.format.simple(),
       logFormat
     ),
   }),
 
   new winston.transports.File({
-    filename: 'logs/combined.log',
+    filename: "logs/combined.log",
     maxsize: 5 * 1024 * 1024, // 5MB
     maxFiles: 5,
-    level: 'info',
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.json()
@@ -55,8 +63,8 @@ const transports = [
   }),
 
   new winston.transports.File({
-    filename: 'logs/error.log',
-    level: 'error',
+    filename: "logs/error.log",
+    level: "error",
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.json()
@@ -69,7 +77,7 @@ const transports = [
  * The configuration is dynamic based on the `NODE_ENV` environment variable.
  */
 const logger = winston.createLogger({
-  level: env.NODE_ENV === 'development' ? 'debug' : 'info',
+  level: env.NODE_ENV === "development" ? "debug" : "info",
   levels: logLevels,
   format: winston.format.json(),
   transports: transports,

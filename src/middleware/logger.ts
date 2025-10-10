@@ -6,16 +6,29 @@ export const requestLogger = (
   res: Response,
   next: NextFunction
 ) => {
+  const startTime = process.hrtime();
   const timestamp = new Date().toISOString();
-  const jwtPresent = !!(req.cookies && req.cookies.jwt);
-  logger.info(
-    `${timestamp} - ${req.method} ${
-      req.url
-    } JWT:${jwtPresent}, Body: ${JSON.stringify(
-      req.body
-    )}, Query: ${JSON.stringify(req.query)}, Params: ${JSON.stringify(
-      req.params
-    )}`
-  );
+
+  logger.http(`[REQUEST] ${req.method} ${req.url}`, {
+    url: req.originalUrl || req.url,
+    method: req.method,
+    headers: req.headers,
+    query: req.query,
+    body: req.body,
+    cookies: req.cookies,
+    timestamp,
+  });
+
+  res.on("finish", () => {
+    const [seconds, nanoseconds] = process.hrtime(startTime);
+    const durationMs = seconds * 1000 + nanoseconds / 1000000;
+
+    // Log final status code and response time
+    logger.http(`[RESPONSE] ${req.method} ${req.originalUrl} `, {
+      statusCode: res.statusCode,
+      durationMs: durationMs.toFixed(3),
+    });
+  });
+
   next();
 };

@@ -1,16 +1,14 @@
 import type { Request, Response } from "express";
 import status from "http-status";
 
-import {
-  signToken,
-  verifyRefreshToken,
-  type JwtPayload,
-} from "../../../../utils/jwt.js";
+import { signToken, verifyRefreshToken, type JwtPayload } from "@/utils/jwt.js";
 import {
   createRefreshToken,
   validateRefreshToken,
-} from "../../../../cache/refreshToken.cache.js";
-import { env, logger } from "../../../../config/index.js";
+} from "@/cache/refreshToken.cache.js";
+import { env, logger } from "@/config/index.js";
+
+import { authenticateUser } from "./auth.service.js";
 
 export const login = async (req: Request, res: Response) => {
   if (!req.body || !req.body.email || !req.body.password) {
@@ -36,7 +34,7 @@ export const login = async (req: Request, res: Response) => {
   const accessToken = signToken(payload);
   const refreshToken = await createRefreshToken(payload);
 
-  logger.info(`User logged in successfully: ${email}`);
+  logger.info(`User logged in successfully: ${user.id}`);
 
   res.cookie("jwt", refreshToken, {
     httpOnly: true, // Prevents client-side JS access (XSS mitigation)

@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express";
 import cors from "cors";
-import { env, logger } from "./config/index.js";
+import { connectDB, env, logger } from "./config/index.js";
 import v1Router from "./api/v1/routes.js";
 import cookieParser from "cookie-parser";
 import { requestLogger } from "./middleware/logger.js";
@@ -23,13 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 app.use("/api/v1", v1Router);
-app.post("/health", (req: Request, res: Response) => {
-  const { status } = req.body;
-  logger.info(`Health: ${status}`);
-  res.sendStatus(200);
-});
+
+connectDB();
 
 // Start the Express server
 app.listen(PORT, () => {
-  logger.info(`Server is running at http://localhost:${PORT}`);
+  logger.info(`Server is running on PORT: ${PORT}`);
 });

@@ -8,6 +8,7 @@
 import { env } from "./server.config.js";
 import { logger } from "./logger.config.js";
 import { connectToRedis, disconnectFromRedis } from "./redis.config.js";
+import { connectDB } from "./mongoose.config.js";
 
 /**
  * Re-export all configurations.
@@ -16,4 +17,4 @@ import { connectToRedis, disconnectFromRedis } from "./redis.config.js";
  *
  * `import { env, logger, connectToRedis } from '../config';`
  */
-export { env, logger, connectToRedis, disconnectFromRedis };
+export { env, logger, connectToRedis, disconnectFromRedis, connectDB };
