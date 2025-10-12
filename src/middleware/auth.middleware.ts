@@ -3,7 +3,7 @@ import status from "http-status";
 
 import { verifyToken, type JwtPayload } from "@/utils/jwt.js";
 import { logger } from "@/config/index.js";
-import { Role } from "@/types/roles.js";
+import { UserSchemas } from "@/schema/index.js";
 
 // Extend the Express Request type to include a user property
 declare global {
@@ -19,7 +19,7 @@ declare global {
  * @param roles Array of roles that are allowed to access the route.
  * @returns Middleware function that checks the JWT and user role.
  */
-export const protectFor = (roles: Role[]) => {
+export const protectFor = (roles: UserSchemas.Role[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     if (
@@ -56,3 +56,5 @@ export const protectFor = (roles: Role[]) => {
     next();
   };
 };
+
+export const protect = protectFor([]); // No role restriction, just authentication

@@ -19,9 +19,6 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
-    "@types/supertest": "^6.0.3",
-    "jest": "^30.0.5",
-    "supertest": "^7.1.4",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
@@ -31,7 +28,7 @@
     "express": "^5.1.0",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.19.1",
+    "mongodb": "^6.20.0",
     "redis": "^5.7.0",
     "ulid": "^3.0.1",
     "winston": "^3.17.0",

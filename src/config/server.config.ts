@@ -49,6 +49,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   DATABASE_URL: z.url("DATABASE_URL must be a valid URL"),
+  DATABASE_NAME: z.string().min(1, "DATABASE_NAME is required"),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   REFRESH_TOKEN_SECRET: z.string().min(1, "REFRESH_TOKEN_SECRET is required"),
   REFRESH_TOKEN_EXPIRY: durationSchema("7d"),

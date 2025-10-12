@@ -2,11 +2,11 @@
 
 import jwt from "jsonwebtoken";
 import { env, logger } from "../config/index.js";
-import { Role } from "../types/roles.js";
+import type { UserSchemas } from "@/schema/index.js";
 
 export interface JwtPayload {
   id: string;
-  role: Role;
+  roles: UserSchemas.Role[];
 }
 
 export const signToken = (payload: JwtPayload): string => {

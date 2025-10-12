@@ -7,14 +7,16 @@
 
 import { env } from "./server.config.js";
 import { logger } from "./logger.config.js";
-import { connectToRedis, disconnectFromRedis } from "./redis.config.js";
-import { connectDB } from "./mongoose.config.js";
+import { connectToRedis } from "./redis.config.js";
+import { client, db, connectDB } from "./mongodb.config.js";
+
+const redisClient = await connectToRedis();
 
 /**
  * Re-export all configurations.
  * This allows other files in the application to import multiple
  * configuration objects from a single line:
  *
- * `import { env, logger, connectToRedis } from '../config';`
+ * `import { env, logger, redisClient } from '../config';`
  */
-export { env, logger, connectToRedis, disconnectFromRedis, connectDB };
+export { env, logger, redisClient, db, client, connectDB };

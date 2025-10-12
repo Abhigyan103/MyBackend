@@ -21,11 +21,11 @@ export const connectToRedis = async (): Promise<RedisClientType> => {
     redisClient = createClient({ url: env.REDIS_URL });
 
     redisClient.on("connect", () => {
-      logger.info("Redis client is connecting...");
+      logger.ongoing("Redis client is connecting...");
     });
 
     redisClient.on("ready", () => {
-      logger.info("Redis client connected successfully!");
+      logger.info("Redis connected successfully!");
     });
 
     redisClient.on("error", (err) => {
@@ -33,7 +33,7 @@ export const connectToRedis = async (): Promise<RedisClientType> => {
     });
 
     redisClient.on("end", () => {
-      logger.warn("Redis client connection has been closed.");
+      logger.db("Redis client connection has been closed.");
     });
 
     // Initiate the connection to Redis
@@ -44,16 +44,5 @@ export const connectToRedis = async (): Promise<RedisClientType> => {
     logger.error("Failed to initialize or connect to Redis client:", error);
     // Propagate the error to the caller
     throw new Error("Could not connect to Redis.");
-  }
-};
-
-/**
- * Helper function to gracefully disconnect the Redis client.
- * This should be called on application shutdown.
- */
-export const disconnectFromRedis = async (): Promise<void> => {
-  if (redisClient && redisClient.isReady) {
-    await redisClient.quit();
-    logger.info("Redis client disconnected gracefully.");
   }
 };

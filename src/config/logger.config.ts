@@ -1,24 +1,33 @@
 import winston from "winston";
 import { env } from "./server.config.js";
 
+interface CustomLevels extends winston.Logger {
+  db: winston.LeveledLogMethod;
+  ongoing: winston.LeveledLogMethod;
+}
+
 const logLevels = {
   error: 0,
   warn: 1,
-  info: 2,
-  http: 3,
-  verbose: 4,
-  debug: 5,
-  silly: 6,
+  http: 2,
+  ongoing: 3,
+  info: 4,
+  verbose: 5,
+  db: 6,
+  debug: 7,
+  silly: 8,
 };
 
 const colors = {
   error: "red",
   warn: "yellow",
-  info: "green",
   http: "magenta",
+  ongoing: "italic gray",
+  info: "green",
   verbose: "cyan",
+  db: "blue",
   debug: "white",
-  silly: "gray",
+  silly: "black",
 };
 
 winston.addColors(colors);
@@ -81,6 +90,6 @@ const logger = winston.createLogger({
   levels: logLevels,
   format: winston.format.json(),
   transports: transports,
-});
+}) as CustomLevels;
 
 export { logger };

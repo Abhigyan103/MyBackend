@@ -1,9 +1,9 @@
-import express, { type Request, type Response } from "express";
+import express from "express";
 import cors from "cors";
 import { connectDB, env, logger } from "./config/index.js";
 import v1Router from "./api/v1/routes.js";
 import cookieParser from "cookie-parser";
-import { requestLogger } from "./middleware/logger.js";
+import { requestLogger } from "./middleware/logger.middleware.js";
 // Initialize Express app
 const app = express();
 const PORT = env.PORT;
@@ -20,6 +20,8 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+// Custom middlewares
 app.use(requestLogger);
 
 app.use("/api/v1", v1Router);

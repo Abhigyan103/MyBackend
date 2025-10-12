@@ -8,17 +8,36 @@ import {
 } from "@/cache/refreshToken.cache.js";
 import { env, logger } from "@/config/index.js";
 
-import { authenticateUser } from "./auth.service.js";
+import * as authService from "./auth.service.js";
 
-export const login = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   if (!req.body || !req.body.email || !req.body.password) {
     return res
-      .status(status.UNAUTHORIZED)
+      .status(status.BAD_REQUEST)
       .json({ message: "Email and password are required." });
   }
   const { email, password } = req.body;
 
-  const user = await authenticateUser(email, password);
+  try {
+    await authService.registerUser(email, password);
+    res
+      .status(status.CREATED)
+      .json({ message: "User registered successfully." });
+  } catch (error) {
+    logger.error(`Registration error for user ${email}: ${error}`);
+    res.status(status.INTERNAL_SERVER_ERROR).json({ message: "Server error." });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  if (!req.body || !req.body.email || !req.body.password) {
+    return res
+      .status(status.BAD_REQUEST)
+      .json({ message: "Email and password are required." });
+  }
+  const { email, password } = req.body;
+
+  const user = await authService.authenticateUser(email, password);
 
   if (!user) {
     logger.warn(`Login failed for user: ${email}`);
@@ -29,7 +48,7 @@ export const login = async (req: Request, res: Response) => {
 
   const payload: JwtPayload = {
     id: user.id,
-    role: user.role,
+    roles: user.roles,
   };
   const accessToken = signToken(payload);
   const refreshToken = await createRefreshToken(payload);
@@ -82,11 +101,11 @@ export const refreshToken = async (req: Request, res: Response) => {
 
     const newAccessToken = signToken({
       id: payload.id,
-      role: payload.role,
+      roles: payload.roles,
     });
     const newRefreshToken = await createRefreshToken({
       id: payload.id,
-      role: payload.role,
+      roles: payload.roles,
     });
 
     logger.info(`New access token issued for user: ${payload.id}`);

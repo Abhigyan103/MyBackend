@@ -16,6 +16,7 @@ export const requestLogger = (
     query: req.query,
     body: req.body,
     cookies: req.cookies,
+    ip: req.ip,
     timestamp,
   });
 
