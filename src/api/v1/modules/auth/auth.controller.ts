@@ -12,9 +12,10 @@ import * as authService from "./auth.service.js";
 
 export const register = async (req: Request, res: Response) => {
   if (!req.body || !req.body.email || !req.body.password) {
-    return res
+    res
       .status(status.BAD_REQUEST)
       .json({ message: "Email and password are required." });
+    return;
   }
   const { email, password } = req.body;
 
@@ -31,24 +32,24 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   if (!req.body || !req.body.email || !req.body.password) {
-    return res
+    res
       .status(status.BAD_REQUEST)
       .json({ message: "Email and password are required." });
+    return;
   }
   const { email, password } = req.body;
 
   const user = await authService.authenticateUser(email, password);
 
-  if (!user) {
+  if (!user || !user.roles || user.roles.length <= 0) {
     logger.warn(`Login failed for user: ${email}`);
-    return res
-      .status(status.UNAUTHORIZED)
-      .json({ message: "Invalid credentials." });
+    res.status(status.UNAUTHORIZED).json({ message: "Invalid credentials." });
+    return;
   }
 
   const payload: JwtPayload = {
     id: user.id,
-    roles: user.roles,
+    role: user.roles[0]!, // Assuming the first role is the primary role
   };
   const accessToken = signToken(payload);
   const refreshToken = await createRefreshToken(payload);
@@ -76,9 +77,8 @@ export const refreshToken = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.jwt;
 
     if (!refreshToken) {
-      return res
-        .status(status.UNAUTHORIZED)
-        .json({ message: "Invalid request." });
+      res.status(status.UNAUTHORIZED).json({ message: "Invalid request." });
+      return;
     }
 
     const isValid = await validateRefreshToken(refreshToken);
@@ -86,26 +86,28 @@ export const refreshToken = async (req: Request, res: Response) => {
     if (!isValid) {
       logger.warn(`Refresh token failed.`);
       res.clearCookie("jwt");
-      return res
+      res
         .status(status.UNAUTHORIZED)
         .json({ message: "Invalid or expired refresh token." });
+      return;
     }
 
     const payload = verifyRefreshToken(refreshToken);
     if (!payload) {
       logger.warn(`Refresh token verification failed.`);
-      return res
+      res
         .status(status.UNAUTHORIZED)
         .json({ message: "Invalid or expired refresh token." });
+      return;
     }
 
     const newAccessToken = signToken({
       id: payload.id,
-      roles: payload.roles,
+      role: payload.role,
     });
     const newRefreshToken = await createRefreshToken({
       id: payload.id,
-      roles: payload.roles,
+      role: payload.role,
     });
 
     logger.info(`New access token issued for user: ${payload.id}`);

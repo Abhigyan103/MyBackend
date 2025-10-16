@@ -6,7 +6,7 @@ import type { UserSchemas } from "@/schema/index.js";
 
 export interface JwtPayload {
   id: string;
-  roles: UserSchemas.Role[];
+  role: UserSchemas.Role;
 }
 
 export const signToken = (payload: JwtPayload): string => {
