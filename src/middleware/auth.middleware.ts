@@ -9,7 +9,7 @@ import { UserSchemas } from "@/schema/index.js";
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload;
+      jwt?: JwtPayload;
     }
   }
 }
@@ -55,7 +55,7 @@ export const restrictTo = (roles: UserSchemas.Role[]) => {
       });
       return;
     }
-    req.user = payload;
+    req.jwt = payload;
     next();
   };
 };

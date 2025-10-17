@@ -12,7 +12,6 @@ const { SALT_LENGTH } = PASSWORD_DATA_CONSTANTS;
 const PasswordSchema = z.object({
   id: z.string().length(ID_LENGTH, `ID must be ${ID_LENGTH} characters long`),
   passwordHash: z.string().min(1),
-  salt: z.string().length(SALT_LENGTH),
   createdAt: z.date().optional().default(new Date()),
 });
 

@@ -15,13 +15,11 @@ import {
 export const createPassword = async (
   id: string,
   passwordHash: string,
-  salt: string,
   options?: InsertOneOptions
 ): Promise<IPassword> => {
   const newPasswordData = PasswordSchema.parse({
     id,
     passwordHash,
-    salt,
   });
   await PasswordCollection.insertOne(newPasswordData, options);
   return newPasswordData;
@@ -38,7 +36,6 @@ export const getUserPassword = async (
 export const updateUserPassword = async (
   id: string,
   newPasswordHash: string,
-  newSalt: string,
   options?: UpdateOptions & {
     sort?: Sort;
   }
@@ -46,7 +43,6 @@ export const updateUserPassword = async (
   const updatedPasswordData = PasswordSchema.parse({
     id,
     passwordHash: newPasswordHash,
-    salt: newSalt,
   });
   const result = await PasswordCollection.updateOne(
     { id },

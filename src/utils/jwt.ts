@@ -1,5 +1,3 @@
-// src/utils/jwt.ts
-
 import jwt from "jsonwebtoken";
 import { env, logger } from "../config/index.js";
 import type { UserSchemas } from "@/schema/index.js";

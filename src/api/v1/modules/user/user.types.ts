@@ -1,5 +1,7 @@
-export interface IUserQuery {
-  email?: string;
-  id?: string;
-  username?: string;
-}
+import type { ExactlyOne } from "@/utils/validation.js";
+
+export type IUserQuery = ExactlyOne<{
+  email: string;
+  username: string;
+  id: string;
+}>;

@@ -25,18 +25,12 @@ export const createUser = async (
     username?: string;
   },
   options?: InsertOneOptions
-): Promise<IUser> => {
+) => {
   username = username || email.split("@")[0]!;
   return userRepository.createUser({ email, roles, username }, options);
 };
 
-export const getUser = async (
-  query: IUserQuery,
-  options?: FindOneOptions
-): Promise<IUser | null> => {
-  if (!(query.username || query.id || query.email)) {
-    return null;
-  }
+export const getUser = async (query: IUserQuery, options?: FindOneOptions) => {
   return userRepository.getUser(query, options);
 };
 

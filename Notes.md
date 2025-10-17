@@ -129,6 +129,7 @@ try {
 } catch {
   session.abortTransaction();
 }
+session.endSession();
 ```
 
 This helps in reverting the updates from the DB n case of any error.

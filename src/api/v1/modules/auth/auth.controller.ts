@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
 import { signToken, verifyRefreshToken, type JwtPayload } from "@/utils/jwt.js";
@@ -20,10 +20,24 @@ export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    await authService.registerUser(email, password);
-    res
-      .status(status.CREATED)
-      .json({ message: "User registered successfully." });
+    const user = await authService.registerUser(email, password);
+    const payload: JwtPayload = {
+      id: user.id,
+      role: user.roles[0]!, // Assuming the first role is the primary role
+    };
+    const accessToken = signToken(payload);
+    const refreshToken = await createRefreshToken(payload);
+
+    logger.info(`User logged in successfully: ${user.id}`);
+
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true, // Prevents client-side JS access (XSS mitigation)
+      secure: env.NODE_ENV === "production", // Use 'secure' in production
+      sameSite: "strict", // CSRF mitigation
+      maxAge: env.REFRESH_TOKEN_EXPIRY * 1000, // Convert to milliseconds
+    });
+
+    res.status(status.CREATED).json({ accessToken });
   } catch (error) {
     logger.error(`Registration error for user ${email}: ${error}`);
     res.status(status.INTERNAL_SERVER_ERROR).json({ message: "Server error." });
@@ -39,7 +53,7 @@ export const login = async (req: Request, res: Response) => {
   }
   const { email, password } = req.body;
 
-  const user = await authService.authenticateUser(email, password);
+  const user = await authService.authenticateUser({ email }, password);
 
   if (!user || !user.roles || user.roles.length <= 0) {
     logger.warn(`Login failed for user: ${email}`);

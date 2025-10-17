@@ -37,6 +37,5 @@ const UserCollection = db.collection<IUser>("users");
 UserCollection.createIndex({ email: 1 }, { unique: true });
 UserCollection.createIndex({ id: 1 }, { unique: true });
 UserCollection.createIndex({ username: 1 }, { unique: true });
-UserCollection.createIndex({ phone: 1 }, { unique: true, sparse: true });
 
 export { type IUser, UserSchema, UserCollection };
