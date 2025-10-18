@@ -54,3 +54,13 @@ export const authenticateUser = async (
   }
   return user;
 };
+
+export const deleteUser = async (userId: string) => {
+  try {
+    await authRepository.deleteUserPassword(userId);
+    // Delete user
+    await userService.deleteUser(userId);
+  } catch (error) {
+    throw error;
+  }
+};

@@ -28,6 +28,9 @@ export const requestLogger = (
     logger.http(`[RESPONSE] ${req.method} ${req.originalUrl} `, {
       statusCode: res.statusCode,
       durationMs: durationMs.toFixed(3),
+      type: "response",
+      method: req.method,
+      url: req.originalUrl || req.url,
     });
   });
 

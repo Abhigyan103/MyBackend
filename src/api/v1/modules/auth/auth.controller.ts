@@ -142,3 +142,10 @@ export const refreshToken = async (req: Request, res: Response) => {
     res.status(status.INTERNAL_SERVER_ERROR).json({ message: "Server error." });
   }
 };
+
+export const deleteAccount = async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  await authService.deleteUser(userId);
+  res.clearCookie("jwt");
+  res.status(status.NO_CONTENT).send();
+};
