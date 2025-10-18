@@ -1,5 +1,5 @@
 import winston from "winston";
-import { env } from "./server.config.js";
+import { env, NodeEnv } from "./server.config.js";
 
 interface CustomLevels extends winston.Logger {
   db: winston.LeveledLogMethod;
@@ -81,12 +81,25 @@ const transports = [
   }),
 ];
 
+const getLevel = (NODE_ENV: NodeEnv) => {
+  switch (NODE_ENV) {
+    case NodeEnv.local:
+      return "silly";
+    case NodeEnv.development:
+      return "debug";
+    case NodeEnv.test:
+      return "db";
+    case NodeEnv.production:
+      return "info";
+  }
+};
+
 /**
  * Configure the Winston logger instance.
  * The configuration is dynamic based on the `NODE_ENV` environment variable.
  */
 const logger = winston.createLogger({
-  level: env.NODE_ENV === "development" ? "debug" : "info",
+  level: getLevel(env.NODE_ENV),
   levels: logLevels,
   format: winston.format.json(),
   transports: transports,

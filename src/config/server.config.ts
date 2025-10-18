@@ -42,18 +42,24 @@ export function durationSchema(defaultValue: string | number) {
   }, z.number().default(defaultMs));
 }
 
+const NodeEnvEnum = z.enum(["local", "development", "production", "test"]);
+
+export type NodeEnv = z.infer<typeof NodeEnvEnum>;
+
+export const NodeEnv = {
+  ...NodeEnvEnum.enum,
+} as const;
+
 const envSchema = z.object({
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: NodeEnvEnum.default("local"),
   PORT: z.coerce.number().default(3000),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   DATABASE_URL: z.url("DATABASE_URL must be a valid URL"),
   DATABASE_NAME: z.string().min(1, "DATABASE_NAME is required"),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  JWT_EXPIRY: durationSchema("15m"),
   REFRESH_TOKEN_SECRET: z.string().min(1, "REFRESH_TOKEN_SECRET is required"),
   REFRESH_TOKEN_EXPIRY: durationSchema("7d"),
-  JWT_EXPIRY: durationSchema("15m"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

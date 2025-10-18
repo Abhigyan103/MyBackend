@@ -4,6 +4,9 @@ import { connectDB, env, logger } from "./config/index.js";
 import v1Router from "./api/v1/routes.js";
 import cookieParser from "cookie-parser";
 import { requestLogger } from "./middleware/logger.middleware.js";
+
+logger.info(`Starting server in ${env.NODE_ENV.toUpperCase()} mode...`);
+
 // Initialize Express app
 const app = express();
 const PORT = env.PORT;
