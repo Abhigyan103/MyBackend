@@ -7,17 +7,16 @@ import type {
 } from "mongodb";
 
 import {
-  type IPassword,
   PasswordCollection,
-  PasswordSchema,
+  HashedPasswordSchema,
 } from "@/models/password.model.js";
 
 export const createPassword = async (
   id: string,
   passwordHash: string,
   options?: InsertOneOptions
-): Promise<IPassword> => {
-  const newPasswordData = PasswordSchema.parse({
+) => {
+  const newPasswordData = HashedPasswordSchema.parse({
     id,
     passwordHash,
   });
@@ -25,10 +24,7 @@ export const createPassword = async (
   return newPasswordData;
 };
 
-export const getUserPassword = async (
-  id: string,
-  options?: FindOneOptions
-): Promise<IPassword | null> => {
+export const getUserPassword = async (id: string, options?: FindOneOptions) => {
   const passwordData = await PasswordCollection.findOne({ id }, options);
   return passwordData;
 };
@@ -39,8 +35,8 @@ export const updateUserPassword = async (
   options?: UpdateOptions & {
     sort?: Sort;
   }
-): Promise<boolean> => {
-  const updatedPasswordData = PasswordSchema.parse({
+) => {
+  const updatedPasswordData = HashedPasswordSchema.parse({
     id,
     passwordHash: newPasswordHash,
   });
@@ -55,7 +51,7 @@ export const updateUserPassword = async (
 export const deleteUserPassword = async (
   id: string,
   options?: DeleteOptions
-): Promise<boolean> => {
+) => {
   const result = await PasswordCollection.deleteOne({ id }, options);
   return result.deletedCount > 0;
 };

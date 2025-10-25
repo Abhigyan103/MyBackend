@@ -1,9 +1,15 @@
-import express from "express";
-import cors from "cors";
-import { connectDB, env, logger } from "./config/index.js";
-import v1Router from "./api/v1/routes.js";
 import cookieParser from "cookie-parser";
-import { requestLogger } from "./middleware/logger.middleware.js";
+import cors from "cors";
+import express from "express";
+
+import { connectDB, env, logger } from "@/config/index.js";
+
+import v1Router from "./api/v1/routes.js";
+import {
+  errorHandler,
+  notFoundHandler,
+  requestLogger,
+} from "./middleware/index.js";
 
 logger.info(`Starting server in ${env.NODE_ENV.toUpperCase()} mode...`);
 
@@ -28,6 +34,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 app.use("/api/v1", v1Router);
+
+// Error handling middlewares
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 connectDB();
 

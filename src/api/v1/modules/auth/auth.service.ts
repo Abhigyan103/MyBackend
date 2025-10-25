@@ -1,6 +1,8 @@
-import { UserSchemas } from "@/schema/index.js";
+import { UserSchemas, FormSchemas } from "@/schema/index.js";
 import type { IUser } from "@/models/user.model.js";
 import { comparePasswords, hashPassword } from "@/utils/password.js";
+import { CustomError } from "@/utils/error.js";
+import { CustomErrorTypes } from "@/types/error.types.js";
 
 import * as authRepository from "./auth.repository.js";
 import * as userService from "../user/user.service.js";
@@ -11,6 +13,7 @@ export const registerUser = async (
   password: string,
   roles: UserSchemas.Role[] = [UserSchemas.Roles.user]
 ) => {
+  FormSchemas.RegisterUserSchema.parse({ email, password });
   // const session = client.startSession();
   try {
     // session.startTransaction();
@@ -37,20 +40,32 @@ export const authenticateUser = async (
   // Fetch user by email or username
   const user = await userService.getUser(query);
   if (!user) {
-    throw new Error("User not found");
+    throw new CustomError(
+      404,
+      "User not found",
+      CustomErrorTypes.InvalidCredentialsError
+    );
   }
   // Fetch password data
   const passwordData = await authRepository.getUserPassword(user.id, {
     projection: { _id: 0, passwordHash: 1 },
   });
   if (!passwordData) {
-    throw new Error("Password data not found");
+    throw new CustomError(
+      404,
+      "Password data not found",
+      CustomErrorTypes.InvalidCredentialsError
+    );
   }
   // Verify password
   // Hash the provided password with the stored salt and compare with stored hash
   const isValid = comparePasswords(password, passwordData.passwordHash);
   if (!isValid) {
-    throw new Error("Invalid password");
+    throw new CustomError(
+      404,
+      "Invalid password",
+      CustomErrorTypes.InvalidCredentialsError
+    );
   }
   return user;
 };

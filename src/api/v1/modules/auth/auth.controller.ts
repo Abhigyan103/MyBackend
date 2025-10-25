@@ -1,3 +1,5 @@
+import { MongoServerError } from "mongodb";
+import { ZodError } from "zod";
 import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
@@ -7,14 +9,21 @@ import {
   validateRefreshToken,
 } from "@/cache/refreshToken.cache.js";
 import { env, logger } from "@/config/index.js";
+import { CustomError } from "@/utils/error.js";
+import { CustomErrorTypes } from "@/types/error.types.js";
 
 import * as authService from "./auth.service.js";
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body || !req.body.email || !req.body.password) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ message: "Email and password are required." });
+    next({
+      status: status.BAD_REQUEST,
+      message: "Email and password are required.",
+    });
     return;
   }
   const { email, password } = req.body;
@@ -36,82 +45,150 @@ export const register = async (req: Request, res: Response) => {
       sameSite: "strict", // CSRF mitigation
       maxAge: env.REFRESH_TOKEN_EXPIRY * 1000, // Convert to milliseconds
     });
-
     res.status(status.CREATED).json({ accessToken });
-  } catch (error) {
-    logger.error(`Registration error for user ${email}: ${error}`);
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: "Server error." });
+  } catch (error: any) {
+    if (error instanceof CustomError) {
+      next({
+        status: error.status,
+        message: error.message,
+        stack: error.stack,
+      });
+      return;
+    }
+    if (error instanceof ZodError) {
+      const invalidFields = error.issues.map((issue) => {
+        return { [issue.path.join(".")]: issue.message };
+      });
+      next({
+        status: status.BAD_REQUEST,
+        message: "Invalid input data.",
+        stack: error.stack,
+        fields: invalidFields,
+      });
+      return;
+    }
+    if (error instanceof MongoServerError) {
+      if (error.code === 11000) {
+        next({
+          status: status.CONFLICT,
+          fields: Object.keys(error.keyValue).map((key) => ({
+            [key]: `${key} already exists.`,
+          })),
+          message: "Invalid input data.",
+        });
+        return;
+      }
+    }
+    next({
+      status: status.INTERNAL_SERVER_ERROR,
+      message: "Server error.",
+      stack: error.stack,
+    });
   }
 };
 
-export const login = async (req: Request, res: Response) => {
-  if (!req.body || !req.body.email || !req.body.password) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ message: "Email and password are required." });
-    return;
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.body || !req.body.email || !req.body.password) {
+      next({
+        status: status.BAD_REQUEST,
+        message: "Email and password are required.",
+      });
+      return;
+    }
+    const { email, password } = req.body;
+
+    const user = await authService.authenticateUser({ email }, password);
+
+    if (!user || !user.roles || user.roles.length <= 0) {
+      logger.warn(`Login failed for user: ${email}`);
+      next({
+        status: status.UNAUTHORIZED,
+        message: "Invalid credentials.",
+      });
+      return;
+    }
+
+    const payload: JwtPayload = {
+      id: user.id,
+      role: user.roles[0]!, // Assuming the first role is the primary role
+    };
+    const accessToken = signToken(payload);
+    const refreshToken = await createRefreshToken(payload);
+
+    logger.info(`User logged in successfully: ${user.id}`);
+
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true, // Prevents client-side JS access (XSS mitigation)
+      secure: env.NODE_ENV === "production", // Use 'secure' in production
+      sameSite: "strict", // CSRF mitigation
+      maxAge: env.REFRESH_TOKEN_EXPIRY * 1000, // Convert to milliseconds
+    });
+
+    res.status(status.OK).json({
+      accessToken,
+    });
+  } catch (error: any) {
+    if (error instanceof CustomError) {
+      if (error.type === CustomErrorTypes.InvalidCredentialsError) {
+        next({
+          status: error.status,
+          message: "Invalid email or password.",
+          stack: error.stack,
+        });
+      }
+      return;
+    }
+    next({
+      status: status.INTERNAL_SERVER_ERROR,
+      message: "Server error.",
+      stack: error.stack,
+    });
   }
-  const { email, password } = req.body;
-
-  const user = await authService.authenticateUser({ email }, password);
-
-  if (!user || !user.roles || user.roles.length <= 0) {
-    logger.warn(`Login failed for user: ${email}`);
-    res.status(status.UNAUTHORIZED).json({ message: "Invalid credentials." });
-    return;
-  }
-
-  const payload: JwtPayload = {
-    id: user.id,
-    role: user.roles[0]!, // Assuming the first role is the primary role
-  };
-  const accessToken = signToken(payload);
-  const refreshToken = await createRefreshToken(payload);
-
-  logger.info(`User logged in successfully: ${user.id}`);
-
-  res.cookie("jwt", refreshToken, {
-    httpOnly: true, // Prevents client-side JS access (XSS mitigation)
-    secure: env.NODE_ENV === "production", // Use 'secure' in production
-    sameSite: "strict", // CSRF mitigation
-    maxAge: env.REFRESH_TOKEN_EXPIRY * 1000, // Convert to milliseconds
-  });
-
-  res.status(status.OK).json({
-    accessToken,
-  });
 };
 
 /**
  * Controller to handle refresh token requests.
  * Issues a new access token if the refresh token is valid.
  */
-export const refreshToken = async (req: Request, res: Response) => {
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const refreshToken = req.cookies.jwt;
 
-    if (!refreshToken) {
-      res.status(status.UNAUTHORIZED).json({ message: "Invalid request." });
+    if (!refreshToken || typeof refreshToken !== "string") {
+      next({
+        status: status.UNAUTHORIZED,
+        message: "No refresh token provided.",
+      });
       return;
     }
 
     const isValid = await validateRefreshToken(refreshToken);
 
     if (!isValid) {
-      logger.warn(`Refresh token failed.`);
       res.clearCookie("jwt");
-      res
-        .status(status.UNAUTHORIZED)
-        .json({ message: "Invalid or expired refresh token." });
+      next({
+        status: status.UNAUTHORIZED,
+        message: "Invalid or expired refresh token.",
+      });
       return;
     }
 
     const payload = verifyRefreshToken(refreshToken);
     if (!payload) {
-      logger.warn(`Refresh token verification failed.`);
-      res
-        .status(status.UNAUTHORIZED)
-        .json({ message: "Invalid or expired refresh token." });
+      res.clearCookie("jwt");
+      next({
+        status: status.UNAUTHORIZED,
+        message: "Invalid or expired refresh token.",
+      });
       return;
     }
 
@@ -136,16 +213,32 @@ export const refreshToken = async (req: Request, res: Response) => {
     res.status(status.OK).json({
       accessToken: newAccessToken,
     });
-  } catch (error) {
-    logger.error(`Error in refreshToken controller: ${error}`);
+  } catch (error: any) {
     res.clearCookie("jwt");
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: "Server error." });
+    next({
+      status: status.INTERNAL_SERVER_ERROR,
+      message: "Could not refresh token.",
+      stack: error.stack,
+    });
   }
 };
 
-export const deleteAccount = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
-  await authService.deleteUser(userId);
-  res.clearCookie("jwt");
-  res.status(status.NO_CONTENT).send();
+export const deleteAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user!.id;
+    await authService.deleteUser(userId);
+    res.clearCookie("jwt");
+    res.status(status.NO_CONTENT).send();
+  } catch (error: any) {
+    res.clearCookie("jwt");
+    next({
+      status: status.INTERNAL_SERVER_ERROR,
+      message: "Could not delete account.",
+      stack: error.stack,
+    });
+  }
 };
