@@ -1,7 +1,7 @@
 {
-  "name": "myratelimiter",
+  "name": "mybackend",
   "version": "1.0.0",
-  "description": "An implementation of a rate limiter",
+  "description": "An implementation of a backend server using NodeJS, Express, TypeScript, MongoDB, and Redis.",
   "license": "ISC",
   "author": "Abhigyan Prakash Singh",
   "type": "module",
@@ -9,8 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist/",
-    "build": "npm run clean && tsc",
-    "typecheck": "npm run clean && tsc --noEmit",
+    "build": "npm run clean && tsc && tsc-alias",
+    "typecheck": "tsc --noEmit",
     "start": "node --env-file=.env dist/app.js",
     "dev": "tsx --watch --env-file=.env src/app.ts",
     "prepare": "husky"
@@ -25,6 +25,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },

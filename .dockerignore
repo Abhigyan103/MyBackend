@@ -1,0 +1,16 @@
+# Ignore the node_modules folder from the local filesystem
+node_modules
+# Ignore the build output directory
+dist
+# Ignore Git-related files
+.git*
+# Ignore development-related files
+.vscode
+.env
+# Ignore large/unnecessary files
+npm-debug.log
+logs/
+*.log
+Notes.md
+README.md
+.prettierrc.js
