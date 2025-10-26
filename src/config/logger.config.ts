@@ -1,4 +1,5 @@
 import winston from "winston";
+
 import { env, NodeEnv } from "./server.config.js";
 
 interface CustomLevels extends winston.Logger {
@@ -46,7 +47,7 @@ const logFormat = winston.format.combine(
     const colorizer = winston.format.colorize();
     log += colorizer.colorize("silly", data);
     return log;
-  })
+  }),
 );
 
 /**
@@ -57,7 +58,7 @@ const transports = [
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize({ all: true }),
-      logFormat
+      logFormat,
     ),
   }),
 
@@ -67,7 +68,7 @@ const transports = [
     maxFiles: 5,
     format: winston.format.combine(
       winston.format.timestamp(),
-      winston.format.json()
+      winston.format.json(),
     ),
   }),
 
@@ -76,7 +77,7 @@ const transports = [
     level: "error",
     format: winston.format.combine(
       winston.format.timestamp(),
-      winston.format.json()
+      winston.format.json(),
     ),
   }),
 ];

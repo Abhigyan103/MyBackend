@@ -1,5 +1,5 @@
-import { z } from "zod";
 import ms from "ms";
+import { z } from "zod";
 
 /*
  * This file should NOT use logger, as it will create a circular dependency.
@@ -31,7 +31,7 @@ export function durationSchema(defaultValue: string | number) {
       const duration = ms(val);
       if (typeof duration !== "number" || duration <= 0) {
         throw new Error(
-          'Value must be a valid duration string (e.g., "7d", "1h")'
+          'Value must be a valid duration string (e.g., "7d", "1h")',
         );
       }
       return duration / 1000; // Convert to seconds

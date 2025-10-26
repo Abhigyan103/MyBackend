@@ -5,10 +5,10 @@
  * parts of the application and keeps the codebase clean and organized.
  */
 
-import { env, NodeEnv } from "./server.config.js";
 import { logger } from "./logger.config.js";
+import { client, connectDB, db } from "./mongodb.config.js";
 import { connectToRedis } from "./redis.config.js";
-import { client, db, connectDB } from "./mongodb.config.js";
+import { env, NodeEnv } from "./server.config.js";
 
 const redisClient = await connectToRedis();
 

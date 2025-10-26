@@ -1,9 +1,9 @@
-import { z } from "zod";
 import { ulid } from "ulid";
+import { z } from "zod";
 
 import { db } from "@/config/index.js";
-import { USER_MODEL_CONSTANTS } from "@/utils/constants.js";
 import { CommonSchemas, UserSchemas } from "@/schema/index.js";
+import { USER_MODEL_CONSTANTS } from "@/utils/constants.js";
 import { PROFILE_PICTURE_DEFAULT_URL } from "@/utils/stringConstants.js";
 
 const { ID_LENGTH } = USER_MODEL_CONSTANTS;

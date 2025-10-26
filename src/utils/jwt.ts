@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-import type { UserSchemas } from "@/schema/index.js";
 import { env, logger } from "@/config/index.js";
+import type { UserSchemas } from "@/schema/index.js";
 
 export interface JwtPayload {
   id: string;

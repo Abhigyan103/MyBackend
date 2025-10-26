@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import status from "http-status";
 
-import { redisClient, db } from "@/config/index.js";
+import { db, redisClient } from "@/config/index.js";
 
 const router = Router();
 

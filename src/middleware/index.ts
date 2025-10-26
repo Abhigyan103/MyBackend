@@ -3,8 +3,8 @@ import {
   restrictFromPublic,
   restrictTo,
 } from "./auth.middleware.js";
-import { requestLogger } from "./logger.middleware.js";
 import errorHandler from "./error.middleware.js";
+import { requestLogger } from "./logger.middleware.js";
 import notFoundHandler from "./notFound.middleware.js";
 
 export {

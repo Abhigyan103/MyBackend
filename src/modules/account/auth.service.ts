@@ -1,7 +1,7 @@
 import { UserSchemas } from "@/schema/index.js";
-import { comparePasswords, hashPassword } from "@/utils/password.js";
-import { CustomError } from "@/utils/error.js";
 import { CustomErrorTypes } from "@/types/error.types.js";
+import { CustomError } from "@/utils/error.js";
+import { comparePasswords, hashPassword } from "@/utils/password.js";
 
 import * as authRepository from "./auth.repository.js";
 import * as userService from "./user.service.js";
@@ -10,7 +10,7 @@ import type { IUserQuery } from "./user.types.js";
 export const registerUser = async (
   email: string,
   password: string,
-  roles: UserSchemas.Role[] = [UserSchemas.Roles.user]
+  roles: UserSchemas.Role[] = [UserSchemas.Roles.user],
 ) => {
   // const session = client.startSession();
   try {
@@ -38,7 +38,7 @@ export const authenticateUser = async (query: IUserQuery, password: string) => {
     throw new CustomError(
       404,
       "User not found",
-      CustomErrorTypes.InvalidCredentialsError
+      CustomErrorTypes.InvalidCredentialsError,
     );
   }
   // Fetch password data
@@ -49,7 +49,7 @@ export const authenticateUser = async (query: IUserQuery, password: string) => {
     throw new CustomError(
       404,
       "Password data not found",
-      CustomErrorTypes.InvalidCredentialsError
+      CustomErrorTypes.InvalidCredentialsError,
     );
   }
   // Verify password
@@ -59,7 +59,7 @@ export const authenticateUser = async (query: IUserQuery, password: string) => {
     throw new CustomError(
       404,
       "Invalid password",
-      CustomErrorTypes.InvalidCredentialsError
+      CustomErrorTypes.InvalidCredentialsError,
     );
   }
   return user;
@@ -78,7 +78,7 @@ export const deleteUser = async (userId: string) => {
 export const changeUserPassword = async (
   userId: string,
   oldPassword: string,
-  newPassword: string
+  newPassword: string,
 ) => {
   try {
     // Authenticate user with old password
@@ -94,7 +94,7 @@ export const changeUserPassword = async (
     throw new CustomError(
       500,
       "Could not change password",
-      CustomErrorTypes.InternalServerError
+      CustomErrorTypes.InternalServerError,
     );
   }
 };

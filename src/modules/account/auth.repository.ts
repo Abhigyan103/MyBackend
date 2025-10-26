@@ -7,14 +7,14 @@ import type {
 } from "mongodb";
 
 import {
-  PasswordCollection,
   HashedPasswordSchema,
+  PasswordCollection,
 } from "@/models/password.model.js";
 
 export const createPassword = async (
   id: string,
   passwordHash: string,
-  options?: InsertOneOptions
+  options?: InsertOneOptions,
 ) => {
   const newPasswordData = HashedPasswordSchema.parse({
     id,
@@ -34,7 +34,7 @@ export const updateUserPassword = async (
   newPasswordHash: string,
   options?: UpdateOptions & {
     sort?: Sort;
-  }
+  },
 ) => {
   const updatedPasswordData = HashedPasswordSchema.parse({
     id,
@@ -43,14 +43,14 @@ export const updateUserPassword = async (
   const result = await PasswordCollection.updateOne(
     { id },
     { $set: updatedPasswordData },
-    options
+    options,
   );
   return result.modifiedCount > 0;
 };
 
 export const deleteUserPassword = async (
   id: string,
-  options?: DeleteOptions
+  options?: DeleteOptions,
 ) => {
   const result = await PasswordCollection.deleteOne({ id }, options);
   return result.deletedCount > 0;

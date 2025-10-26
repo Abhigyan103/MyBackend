@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
 import type { HttpError } from "@/types/error.types.js";

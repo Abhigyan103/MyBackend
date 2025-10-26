@@ -1,6 +1,6 @@
-import { z, ZodError } from "zod";
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
+import { z, ZodError } from "zod";
 
 import { getZodFieldsFromError } from "@/utils/error.js";
 
@@ -21,7 +21,7 @@ export type ValidationSourceType =
  */
 export const validate = (
   schema: z.Schema,
-  source: ValidationSourceType = ValidationSource.BODY // Default to body
+  source: ValidationSourceType = ValidationSource.BODY, // Default to body
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {

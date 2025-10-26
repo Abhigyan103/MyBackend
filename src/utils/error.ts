@@ -1,5 +1,6 @@
-import { CustomErrorTypes } from "@/types/error.types.js";
 import type { ZodError } from "zod";
+
+import { CustomErrorTypes } from "@/types/error.types.js";
 
 export class CustomError extends Error {
   public status: number;
@@ -13,7 +14,7 @@ export class CustomError extends Error {
   constructor(
     status: number,
     message: string,
-    type: CustomErrorTypes = CustomErrorTypes.InternalServerError
+    type: CustomErrorTypes = CustomErrorTypes.InternalServerError,
   ) {
     // Call the parent Error constructor
     super(message);

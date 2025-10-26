@@ -6,7 +6,7 @@ import type {
   UpdateOptions,
 } from "mongodb";
 
-import { type IUser, UserCollection, UserSchema } from "@/models/user.model.js";
+import { UserCollection, UserSchema, type IUser } from "@/models/user.model.js";
 import type { Role } from "@/schema/user.schema.js";
 
 import type { IUserQuery } from "./user.types.js";
@@ -21,7 +21,7 @@ export const createUser = async (
     roles: Role[];
     username: string;
   },
-  options?: InsertOneOptions
+  options?: InsertOneOptions,
 ) => {
   const newUser = UserSchema.parse({
     email,
@@ -34,7 +34,7 @@ export const createUser = async (
 
 export const getUser = async (
   { email, id, username }: IUserQuery,
-  options?: FindOneOptions
+  options?: FindOneOptions,
 ) => {
   const query: { [key: string]: string } = {};
   if (email) query.email = email;
@@ -50,7 +50,7 @@ export const updateUser = async (
   updates: Partial<Omit<IUser, "id" | "createdAt" | "updatedAt">>,
   options?: UpdateOptions & {
     sort?: Sort;
-  }
+  },
 ) => {
   const updatedUser = UserSchema.parse({
     ...updates,
@@ -59,7 +59,7 @@ export const updateUser = async (
   const result = await UserCollection.updateOne(
     { id },
     { $set: updatedUser },
-    options
+    options,
   );
   return result.modifiedCount > 0;
 };

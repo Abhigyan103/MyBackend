@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+
 import { PASSWORD_DATA_CONSTANTS } from "./constants.js";
 
 export const hashPassword = (password: string) => {

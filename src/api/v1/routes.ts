@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import authRoutes from "./auth/auth.route.js";
 import healthRoutes from "./health/health.route.js";
 

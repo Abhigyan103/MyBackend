@@ -1,12 +1,12 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
-import { verifyToken, type JwtPayload } from "@/utils/jwt.js";
 import { logger } from "@/config/index.js";
-import { UserSchemas } from "@/schema/index.js";
-import { getUser } from "@/modules/account/user.repository.js";
 import type { IUser } from "@/models/user.model.js";
+import { getUser } from "@/modules/account/user.repository.js";
+import { UserSchemas } from "@/schema/index.js";
 import type { Role } from "@/schema/user.schema.js";
+import { verifyToken, type JwtPayload } from "@/utils/jwt.js";
 
 declare global {
   namespace Express {
@@ -51,7 +51,7 @@ export const restrictTo = (roles: UserSchemas.Role[]) => {
     // Check if the user has the required role
     if (roles.length > 0 && payload.role && !roles.includes(payload.role)) {
       logger.warn(
-        `Auth error: User role '${payload.role}' not authorized for route: ${req.originalUrl}.`
+        `Auth error: User role '${payload.role}' not authorized for route: ${req.originalUrl}.`,
       );
       return next({
         status: status.FORBIDDEN,
@@ -71,7 +71,7 @@ export const restrictTo = (roles: UserSchemas.Role[]) => {
 
     if (!payload.role || !user.roles.includes(payload.role)) {
       logger.warn(
-        `Auth error: User role '${payload.role}' not valid for user ID: ${payload.id}.`
+        `Auth error: User role '${payload.role}' not valid for user ID: ${payload.id}.`,
       );
       return next({
         status: status.FORBIDDEN,
@@ -94,7 +94,7 @@ export const restrictFromPublic = restrictTo([]); // No role restriction, just a
 export const restrictFrom = (disallowedRoles: UserSchemas.Role[]) => {
   const allRoles = Object.values(UserSchemas.Roles);
   const allowedRoles = allRoles.filter(
-    (role) => !disallowedRoles.includes(role)
+    (role) => !disallowedRoles.includes(role),
   );
   return restrictTo(allowedRoles);
 };

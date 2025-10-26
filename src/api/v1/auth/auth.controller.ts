@@ -1,17 +1,17 @@
-import { MongoServerError, type Auth } from "mongodb";
-import { ZodError } from "zod";
 import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
+import { MongoServerError } from "mongodb";
+import { ZodError } from "zod";
 
-import { signToken, verifyRefreshToken, type JwtPayload } from "@/utils/jwt.js";
 import {
   createRefreshToken,
   validateRefreshToken,
 } from "@/cache/refreshToken.cache.js";
 import { env, logger } from "@/config/index.js";
-import { CustomError, getZodFieldsFromError } from "@/utils/error.js";
-import { CustomErrorTypes } from "@/types/error.types.js";
 import * as authService from "@/modules/account/auth.service.js";
+import { CustomErrorTypes } from "@/types/error.types.js";
+import { CustomError, getZodFieldsFromError } from "@/utils/error.js";
+import { signToken, verifyRefreshToken, type JwtPayload } from "@/utils/jwt.js";
 
 import type {
   ChangePasswordRequestBody,
@@ -22,7 +22,7 @@ import type {
 export const register = async (
   req: Request<{}, {}, RegisterRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { email, password } = req.body;
 
@@ -86,7 +86,7 @@ export const register = async (
 export const login = async (
   req: Request<{}, {}, LoginRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { email, password } = req.body;
@@ -147,7 +147,7 @@ export const login = async (
 export const refreshToken = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const refreshToken = req.cookies.jwt;
@@ -215,7 +215,7 @@ export const refreshToken = async (
 export const deleteAccount = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const userId = req.user!.id;
@@ -235,7 +235,7 @@ export const deleteAccount = async (
 export const changePassword = async (
   req: Request<{}, {}, ChangePasswordRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const userId = req.user!.id;
   const { oldPassword, newPassword } = req.body;

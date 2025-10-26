@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
 import { getUser } from "@/modules/account/user.service.js";
@@ -6,7 +6,7 @@ import { getUser } from "@/modules/account/user.service.js";
 export const allowInitializedUsersOnly = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const user = await getUser({ id: req.user?.id! });

@@ -6,27 +6,27 @@ export const PasswordSchema = z
   .string()
   .min(
     PASSWORD_DATA_CONSTANTS.MIN_PASSWORD_LENGTH,
-    `Password must be at least ${PASSWORD_DATA_CONSTANTS.MIN_PASSWORD_LENGTH} characters long.`
+    `Password must be at least ${PASSWORD_DATA_CONSTANTS.MIN_PASSWORD_LENGTH} characters long.`,
   )
   .max(
     PASSWORD_DATA_CONSTANTS.MAX_PASSWORD_LENGTH,
-    `Password must be at most ${PASSWORD_DATA_CONSTANTS.MAX_PASSWORD_LENGTH} characters long.`
+    `Password must be at most ${PASSWORD_DATA_CONSTANTS.MAX_PASSWORD_LENGTH} characters long.`,
   )
   .regex(
     PASSWORD_DATA_CONSTANTS.UPPERCASE_REGEX,
-    "Password must contain at least one uppercase letter."
+    "Password must contain at least one uppercase letter.",
   )
   .regex(
     PASSWORD_DATA_CONSTANTS.LOWERCASE_REGEX,
-    "Password must contain at least one lowercase letter."
+    "Password must contain at least one lowercase letter.",
   )
   .regex(
     PASSWORD_DATA_CONSTANTS.NUMBER_REGEX,
-    "Password must contain at least one number."
+    "Password must contain at least one number.",
   )
   .regex(
     PASSWORD_DATA_CONSTANTS.SPECIAL_CHAR_REGEX,
-    "Password must contain at least one special character (!@#$%^&*)."
+    "Password must contain at least one special character (!@#$%^&*).",
   )
   .trim();
 

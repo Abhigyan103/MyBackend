@@ -1,8 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status";
 
-import type { HttpError } from "@/types/error.types.js";
 import { env, logger, NodeEnv } from "@/config/index.js";
+import type { HttpError } from "@/types/error.types.js";
 
 /**
  * Global Error Handling Middleware
@@ -13,7 +13,7 @@ const errorHandler = (
   err: HttpError, // Use the custom interface for the error object
   req: Request,
   res: Response,
-  next: NextFunction // The 'next' argument is required even if not used
+  next: NextFunction, // The 'next' argument is required even if not used
 ) => {
   try {
     const stack = err.stack;
