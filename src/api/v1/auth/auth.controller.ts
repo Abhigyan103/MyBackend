@@ -1,4 +1,4 @@
-import { MongoServerError } from "mongodb";
+import { MongoServerError, type Auth } from "mongodb";
 import { ZodError } from "zod";
 import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
@@ -9,23 +9,21 @@ import {
   validateRefreshToken,
 } from "@/cache/refreshToken.cache.js";
 import { env, logger } from "@/config/index.js";
-import { CustomError } from "@/utils/error.js";
+import { CustomError, getZodFieldsFromError } from "@/utils/error.js";
 import { CustomErrorTypes } from "@/types/error.types.js";
+import * as authService from "@/modules/account/auth.service.js";
 
-import * as authService from "./auth.service.js";
+import type {
+  ChangePasswordRequestBody,
+  LoginRequestBody,
+  RegisterRequestBody,
+} from "./auth.validators.js";
 
 export const register = async (
-  req: Request,
+  req: Request<{}, {}, RegisterRequestBody>,
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.body || !req.body.email || !req.body.password) {
-    next({
-      status: status.BAD_REQUEST,
-      message: "Email and password are required.",
-    });
-    return;
-  }
   const { email, password } = req.body;
 
   try {
@@ -56,9 +54,7 @@ export const register = async (
       return;
     }
     if (error instanceof ZodError) {
-      const invalidFields = error.issues.map((issue) => {
-        return { [issue.path.join(".")]: issue.message };
-      });
+      const invalidFields = getZodFieldsFromError(error);
       next({
         status: status.BAD_REQUEST,
         message: "Invalid input data.",
@@ -88,18 +84,11 @@ export const register = async (
 };
 
 export const login = async (
-  req: Request,
+  req: Request<{}, {}, LoginRequestBody>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    if (!req.body || !req.body.email || !req.body.password) {
-      next({
-        status: status.BAD_REQUEST,
-        message: "Email and password are required.",
-      });
-      return;
-    }
     const { email, password } = req.body;
 
     const user = await authService.authenticateUser({ email }, password);
@@ -238,6 +227,34 @@ export const deleteAccount = async (
     next({
       status: status.INTERNAL_SERVER_ERROR,
       message: "Could not delete account.",
+      stack: error.stack,
+    });
+  }
+};
+
+export const changePassword = async (
+  req: Request<{}, {}, ChangePasswordRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user!.id;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    await authService.changeUserPassword(userId, oldPassword, newPassword);
+    res.status(status.OK).send();
+  } catch (error: any) {
+    if (error instanceof CustomError) {
+      next({
+        status: error.status,
+        message: error.message,
+        stack: error.stack,
+      });
+      return;
+    }
+    next({
+      status: status.INTERNAL_SERVER_ERROR,
+      message: "Could not change password.",
       stack: error.stack,
     });
   }

@@ -19,6 +19,7 @@ const errorHandler = (
     const stack = err.stack;
     const status = err.status || HttpStatus.INTERNAL_SERVER_ERROR;
     const fields = err.fields;
+    const data = err.data;
     const errorMessage = err.message || "Something went wrong";
 
     logger.error("[ErrorResponse]", {
@@ -26,12 +27,14 @@ const errorHandler = (
       errorMessage,
       fields,
       status,
+      data,
     });
 
     // Send the error response to the client
     res.status(status).send({
       fields,
       errorMessage,
+      data,
       stack: env.NODE_ENV === NodeEnv.production ? undefined : stack,
     });
   } catch (error: any) {

@@ -1,19 +1,17 @@
-import { UserSchemas, FormSchemas } from "@/schema/index.js";
-import type { IUser } from "@/models/user.model.js";
+import { UserSchemas } from "@/schema/index.js";
 import { comparePasswords, hashPassword } from "@/utils/password.js";
 import { CustomError } from "@/utils/error.js";
 import { CustomErrorTypes } from "@/types/error.types.js";
 
 import * as authRepository from "./auth.repository.js";
-import * as userService from "../user/user.service.js";
-import type { IUserQuery } from "../user/user.types.js";
+import * as userService from "./user.service.js";
+import type { IUserQuery } from "./user.types.js";
 
 export const registerUser = async (
   email: string,
   password: string,
   roles: UserSchemas.Role[] = [UserSchemas.Roles.user]
 ) => {
-  FormSchemas.RegisterUserSchema.parse({ email, password });
   // const session = client.startSession();
   try {
     // session.startTransaction();
@@ -33,10 +31,7 @@ export const registerUser = async (
   }
 };
 
-export const authenticateUser = async (
-  query: IUserQuery,
-  password: string
-): Promise<IUser> => {
+export const authenticateUser = async (query: IUserQuery, password: string) => {
   // Fetch user by email or username
   const user = await userService.getUser(query);
   if (!user) {
@@ -77,5 +72,29 @@ export const deleteUser = async (userId: string) => {
     await userService.deleteUser(userId);
   } catch (error) {
     throw error;
+  }
+};
+
+export const changeUserPassword = async (
+  userId: string,
+  oldPassword: string,
+  newPassword: string
+) => {
+  try {
+    // Authenticate user with old password
+    await authenticateUser({ id: userId }, oldPassword);
+    // Hash the new password
+    const hashedPassword = hashPassword(newPassword);
+    // Update the user's password
+    await authRepository.updateUserPassword(userId, hashedPassword);
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new CustomError(
+      500,
+      "Could not change password",
+      CustomErrorTypes.InternalServerError
+    );
   }
 };

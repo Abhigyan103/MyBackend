@@ -8,6 +8,7 @@ import type {
 
 import { type IUser, UserCollection, UserSchema } from "@/models/user.model.js";
 import type { Role } from "@/schema/user.schema.js";
+
 import type { IUserQuery } from "./user.types.js";
 
 export const createUser = async (
@@ -21,7 +22,7 @@ export const createUser = async (
     username: string;
   },
   options?: InsertOneOptions
-): Promise<IUser> => {
+) => {
   const newUser = UserSchema.parse({
     email,
     roles,
@@ -34,7 +35,7 @@ export const createUser = async (
 export const getUser = async (
   { email, id, username }: IUserQuery,
   options?: FindOneOptions
-): Promise<IUser | null> => {
+) => {
   const query: { [key: string]: string } = {};
   if (email) query.email = email;
   if (id) query.id = id;
@@ -50,7 +51,7 @@ export const updateUser = async (
   options?: UpdateOptions & {
     sort?: Sort;
   }
-): Promise<boolean> => {
+) => {
   const updatedUser = UserSchema.parse({
     ...updates,
     id,
@@ -63,10 +64,7 @@ export const updateUser = async (
   return result.modifiedCount > 0;
 };
 
-export const deleteUser = async (
-  id: string,
-  options?: DeleteOptions
-): Promise<boolean> => {
+export const deleteUser = async (id: string, options?: DeleteOptions) => {
   const result = await UserCollection.deleteOne({ id }, options);
   return result.deletedCount > 0;
 };

@@ -7,11 +7,10 @@ import type {
   UpdateOptions,
 } from "mongodb";
 
-import { client } from "@/config/index.js";
 import { UserSchemas } from "@/schema/index.js";
+import type { IUser } from "@/models/user.model.js";
 
 import * as userRepository from "./user.repository.js";
-import type { IUser } from "@/models/user.model.js";
 import type { IUserQuery } from "./user.types.js";
 
 export const createUser = async (
@@ -38,13 +37,10 @@ export const updateUser = async (
   id: string,
   updates: Partial<Omit<IUser, "id" | "createdAt" | "updatedAt">>,
   options?: UpdateOptions & { sort?: Sort }
-): Promise<boolean> => {
+) => {
   return userRepository.updateUser(id, updates, options);
 };
 
-export const deleteUser = async (
-  id: string,
-  options?: DeleteOptions
-): Promise<boolean> => {
+export const deleteUser = async (id: string, options?: DeleteOptions) => {
   return userRepository.deleteUser(id, options);
 };

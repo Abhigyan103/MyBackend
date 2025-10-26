@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+
 import { env, logger } from "@/config/index.js";
 
 export const client = new MongoClient(env.DATABASE_URL, {
@@ -23,7 +24,7 @@ client.on("commandSucceeded", (data) => {
   });
 });
 
-export const connectDB = async (): Promise<void> => {
+export const connectDB = async () => {
   try {
     await client.connect();
     logger.info("MongoDB connected successfully!");

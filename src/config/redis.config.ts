@@ -1,4 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
+
 import { env } from "./server.config.js";
 import { logger } from "./logger.config.js";
 
@@ -11,7 +12,7 @@ let redisClient: RedisClientType;
  *
  * The connected Redis client instance.
  */
-export const connectToRedis = async (): Promise<RedisClientType> => {
+export const connectToRedis = async () => {
   if (redisClient && redisClient.isReady) {
     logger.info("Redis client is already connected.");
     return redisClient;

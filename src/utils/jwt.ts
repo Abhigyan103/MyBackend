@@ -1,25 +1,26 @@
 import jwt from "jsonwebtoken";
-import { env, logger } from "../config/index.js";
+
 import type { UserSchemas } from "@/schema/index.js";
+import { env, logger } from "@/config/index.js";
 
 export interface JwtPayload {
   id: string;
   role: UserSchemas.Role;
 }
 
-export const signToken = (payload: JwtPayload): string => {
+export const signToken = (payload: JwtPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRY,
   });
 };
 
-export const signRefreshToken = (payload: JwtPayload): string => {
+export const signRefreshToken = (payload: JwtPayload) => {
   return jwt.sign(payload, env.REFRESH_TOKEN_SECRET, {
     expiresIn: env.REFRESH_TOKEN_EXPIRY,
   });
 };
 
-export const verifyToken = (token: string): JwtPayload | null => {
+export const verifyToken = (token: string) => {
   try {
     const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
     return payload;
@@ -29,7 +30,7 @@ export const verifyToken = (token: string): JwtPayload | null => {
   }
 };
 
-export const verifyRefreshToken = (token: string): JwtPayload | null => {
+export const verifyRefreshToken = (token: string) => {
   try {
     const payload = jwt.verify(token, env.REFRESH_TOKEN_SECRET) as JwtPayload;
     if (!payload) {
@@ -42,7 +43,7 @@ export const verifyRefreshToken = (token: string): JwtPayload | null => {
   }
 };
 
-export const generateJwtFromRefresh = (refreshToken: string): string | null => {
+export const generateJwtFromRefresh = (refreshToken: string) => {
   const payload = verifyRefreshToken(refreshToken);
   if (!payload) return null;
 

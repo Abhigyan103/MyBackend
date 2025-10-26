@@ -1,4 +1,5 @@
 import { CustomErrorTypes } from "@/types/error.types.js";
+import type { ZodError } from "zod";
 
 export class CustomError extends Error {
   public status: number;
@@ -30,3 +31,9 @@ export class CustomError extends Error {
     }
   }
 }
+
+export const getZodFieldsFromError = (error: ZodError) => {
+  return error.issues.map((issue) => {
+    return { [issue.path.join(".")]: issue.message };
+  });
+};

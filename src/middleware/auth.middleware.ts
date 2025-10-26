@@ -1,10 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
+import status from "http-status";
 
 import { verifyToken, type JwtPayload } from "@/utils/jwt.js";
 import { logger } from "@/config/index.js";
 import { UserSchemas } from "@/schema/index.js";
-
-import { getUser } from "@/api/v1/modules/user/user.repository.js";
+import { getUser } from "@/modules/account/user.repository.js";
 import type { IUser } from "@/models/user.model.js";
 import type { Role } from "@/schema/user.schema.js";
 
@@ -24,11 +24,7 @@ declare global {
  * @returns Middleware function that checks the JWT and user role.
  */
 export const restrictTo = (roles: UserSchemas.Role[]) => {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     if (
       !authHeader ||
@@ -36,14 +32,20 @@ export const restrictTo = (roles: UserSchemas.Role[]) => {
       authHeader.split(" ").length !== 2
     ) {
       logger.warn("Auth error: No token provided or malformed header.");
-      return next(new Error("Authentication required."));
+      return next({
+        status: status.UNAUTHORIZED,
+        message: "No token provided.",
+      });
     }
     const token = authHeader.split(" ")[1]!;
     const payload = verifyToken(token);
     if (!payload) {
       logger.warn("Auth error: Invalid or expired token.");
       res.clearCookie("jwt");
-      return next(new Error("Invalid or expired token."));
+      return next({
+        status: status.UNAUTHORIZED,
+        message: "Invalid or expired token.",
+      });
     }
 
     // Check if the user has the required role
@@ -51,29 +53,30 @@ export const restrictTo = (roles: UserSchemas.Role[]) => {
       logger.warn(
         `Auth error: User role '${payload.role}' not authorized for route: ${req.originalUrl}.`
       );
-      return next(
-        new Error(
-          "Forbidden: You do not have permission to access this resource."
-        )
-      );
+      return next({
+        status: status.FORBIDDEN,
+        message: "You do not have permission to access this resource.",
+      });
     }
 
     const user = await getUser({ id: payload.id });
 
     if (!user) {
       logger.warn(`Auth error: User not found for ID: ${payload.id}.`);
-      return next(new Error("User not found."));
+      return next({
+        status: status.UNAUTHORIZED,
+        message: "User not found.",
+      });
     }
 
     if (!payload.role || !user.roles.includes(payload.role)) {
       logger.warn(
         `Auth error: User role '${payload.role}' not valid for user ID: ${payload.id}.`
       );
-      return next(
-        new Error(
-          "Forbidden: You do not have permission to access this resource."
-        )
-      );
+      return next({
+        status: status.FORBIDDEN,
+        message: "You do not have permission to access this resource.",
+      });
     }
 
     req.currentRole = payload.role;
