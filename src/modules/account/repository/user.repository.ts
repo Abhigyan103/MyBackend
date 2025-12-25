@@ -6,10 +6,13 @@ import type {
   UpdateOptions,
 } from "mongodb";
 
-import { UserCollection, UserSchema, type IUser } from "@/models/user.model.js";
-import type { Role } from "@/schema/user.schema.js";
-
-import type { IUserQuery } from "./user.types.js";
+import {
+  UserCollection,
+  UserSchema,
+  type IUser,
+} from "../models/user.model.js";
+import type { Role } from "../schema/user.schema.js";
+import type { IUserQuery } from "../types/user.types.js";
 
 export const createUser = async (
   {

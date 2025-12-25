@@ -5,15 +5,6 @@ import { z } from "zod";
  * This file should NOT use logger, as it will create a circular dependency.
  */
 
-/**
- * Creates a Zod schema for a duration value.
- * The schema accepts either a string (e.g., "7d", "1h") or a number (milliseconds).
- * The default value is converted to milliseconds and used if no value is provided.
- *
- * @param defaultValue The default duration value (string or number).
- * @returns A Zod schema for the duration.
- */
-
 export function durationSchema(defaultValue: string | number) {
   const defaultMs = // @ts-ignore: ms() returns number | undefined, but we handle errors below
     typeof defaultValue === "number" ? defaultValue : ms(defaultValue);
@@ -60,6 +51,12 @@ const envSchema = z.object({
   JWT_EXPIRY: durationSchema("15m"),
   REFRESH_TOKEN_SECRET: z.string().min(1, "REFRESH_TOKEN_SECRET is required"),
   REFRESH_TOKEN_EXPIRY: durationSchema("7d"),
+
+  AWS_ENDPOINT: z.url().default("http://localhost:4566"),
+  AWS_ACCOUNT_ID: z.string().default("000000000000"),
+  AWS_REGION: z.string().min(1, "AWS_REGION is required"),
+  AWS_ACCESS_KEY_ID: z.string().default("test"),
+  AWS_SECRET_ACCESS_KEY: z.string().default("test"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

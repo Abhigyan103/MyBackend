@@ -1,9 +1,9 @@
-import { redisClient, env } from "@/config/index.js";
+import { env, redisClient } from "@/config/index.js";
 import {
   signRefreshToken,
   verifyRefreshToken,
   type JwtPayload,
-} from "@/utils/jwt.js";
+} from "@/modules/account/utils/jwt.js";
 
 /**
  * Creates and stores a refresh token in Redis.

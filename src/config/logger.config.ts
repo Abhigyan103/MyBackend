@@ -39,13 +39,19 @@ const logFormat = winston.format.combine(
   winston.format.printf((info) => {
     const { level, message, timestamp, ...dataDump } = info;
 
-    const data = JSON.stringify({
-      timestamp: timestamp,
-      ...dataDump,
-    });
-    let log = `[${info.level}]: ${info.message} `;
     const colorizer = winston.format.colorize();
+    const data = JSON.stringify(info);
+
+    let log = "";
+
+    if (env.NODE_ENV === NodeEnv.local) {
+      log += colorizer.colorize(
+        info.level,
+        `[${info.level}]: ${info.message} `,
+      );
+    }
     log += colorizer.colorize("silly", data);
+
     return log;
   }),
 );
@@ -56,30 +62,27 @@ const logFormat = winston.format.combine(
  */
 const transports = [
   new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize({ all: true }),
-      logFormat,
-    ),
+    format: winston.format.combine(logFormat),
   }),
 
-  new winston.transports.File({
-    filename: "logs/combined.log",
-    maxsize: 5 * 1024 * 1024, // 5MB
-    maxFiles: 5,
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json(),
-    ),
-  }),
+  // new winston.transports.File({
+  //   filename: "logs/combined.log",
+  //   maxsize: 5 * 1024 * 1024, // 5MB
+  //   maxFiles: 5,
+  //   format: winston.format.combine(
+  //     winston.format.timestamp(),
+  //     winston.format.json(),
+  //   ),
+  // }),
 
-  new winston.transports.File({
-    filename: "logs/error.log",
-    level: "error",
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json(),
-    ),
-  }),
+  // new winston.transports.File({
+  //   filename: "logs/error.log",
+  //   level: "error",
+  //   format: winston.format.combine(
+  //     winston.format.timestamp(),
+  //     winston.format.json(),
+  //   ),
+  // }),
 ];
 
 const getLevel = (NODE_ENV: NodeEnv) => {

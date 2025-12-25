@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PASSWORD_DATA_CONSTANTS } from "@/utils/constants.js";
+import { PASSWORD_DATA_CONSTANTS } from "@/modules/account/constants/constants.js";
 
 export const PasswordSchema = z
   .string()
@@ -45,8 +45,13 @@ export const changePasswordBodySchema = z.object({
   newPassword: PasswordSchema,
 });
 
+export const deleteAccountBodySchema = z.object({
+  password: PasswordSchema,
+});
+
 export type LoginRequestBody = z.infer<typeof loginBodySchema>;
 export type RegisterRequestBody = z.infer<typeof registerBodySchema>;
 export type ChangePasswordRequestBody = z.infer<
   typeof changePasswordBodySchema
 >;
+export type DeleteAccountRequestBody = z.infer<typeof deleteAccountBodySchema>;

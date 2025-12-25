@@ -1,11 +1,11 @@
-import { UserSchemas } from "@/schema/index.js";
 import { CustomErrorTypes } from "@/types/error.types.js";
 import { CustomError } from "@/utils/error.js";
-import { comparePasswords, hashPassword } from "@/utils/password.js";
 
-import * as authRepository from "./auth.repository.js";
+import * as authRepository from "../repository/auth.repository.js";
+import * as UserSchemas from "../schema/user.schema.js";
+import type { IUserQuery } from "../types/user.types.js";
+import { comparePasswords, hashPassword } from "../utils/password.js";
 import * as userService from "./user.service.js";
-import type { IUserQuery } from "./user.types.js";
 
 export const registerUser = async (
   email: string,
@@ -41,8 +41,23 @@ export const authenticateUser = async (query: IUserQuery, password: string) => {
       CustomErrorTypes.InvalidCredentialsError,
     );
   }
-  // Fetch password data
-  const passwordData = await authRepository.getUserPassword(user.id, {
+  // Verify password
+  const isValid = await verifyPassword(user.id, password);
+  if (!isValid) {
+    throw new CustomError(
+      404,
+      "Invalid password",
+      CustomErrorTypes.InvalidCredentialsError,
+    );
+  }
+  return user;
+};
+
+export const verifyPassword = async (
+  userId: string,
+  password: string,
+): Promise<boolean> => {
+  const passwordData = await authRepository.getUserPassword(userId, {
     projection: { _id: 0, passwordHash: 1 },
   });
   if (!passwordData) {
@@ -55,6 +70,17 @@ export const authenticateUser = async (query: IUserQuery, password: string) => {
   // Verify password
   // Hash the provided password with the stored salt and compare with stored hash
   const isValid = comparePasswords(password, passwordData.passwordHash);
+  return isValid;
+};
+
+export const deleteUser = async ({
+  userId,
+  password,
+}: {
+  userId: string;
+  password: string;
+}) => {
+  const isValid = await verifyPassword(userId, password);
   if (!isValid) {
     throw new CustomError(
       404,
@@ -62,17 +88,9 @@ export const authenticateUser = async (query: IUserQuery, password: string) => {
       CustomErrorTypes.InvalidCredentialsError,
     );
   }
-  return user;
-};
-
-export const deleteUser = async (userId: string) => {
-  try {
-    await authRepository.deleteUserPassword(userId);
-    // Delete user
-    await userService.deleteUser(userId);
-  } catch (error) {
-    throw error;
-  }
+  await authRepository.deleteUserPassword(userId);
+  // Delete user
+  await userService.deleteUser(userId);
 };
 
 export const changeUserPassword = async (

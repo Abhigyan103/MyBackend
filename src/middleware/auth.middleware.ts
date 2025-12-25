@@ -2,17 +2,16 @@ import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
 import { logger } from "@/config/index.js";
-import type { IUser } from "@/models/user.model.js";
-import { getUser } from "@/modules/account/user.repository.js";
-import { UserSchemas } from "@/schema/index.js";
-import type { Role } from "@/schema/user.schema.js";
-import { verifyToken, type JwtPayload } from "@/utils/jwt.js";
+import type { IUser } from "@/modules/account/models/user.model.js";
+import { getUser } from "@/modules/account/repository/user.repository.js";
+import * as UserSchemas from "@/modules/account/schema/user.schema.js";
+import { verifyToken, type JwtPayload } from "@/modules/account/utils/jwt.js";
 
 declare global {
   namespace Express {
     interface Request {
       user?: IUser;
-      currentRole?: Role;
+      currentRole?: UserSchemas.Role;
       jwt?: JwtPayload;
     }
   }
@@ -86,7 +85,10 @@ export const restrictTo = (roles: UserSchemas.Role[]) => {
   };
 };
 
-export const restrictFromPublic = restrictTo([]); // No role restriction, just authentication
+/**
+ * Middleware to restrict access to authenticated users only.
+ */
+export const restrictFromPublic = restrictTo([]);
 
 /**
  * Middleware to restrict access from specified roles.

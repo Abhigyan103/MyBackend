@@ -5,6 +5,7 @@
  * parts of the application and keeps the codebase clean and organized.
  */
 
+import { s3Client, snsClient, sqsClient } from "./aws.config.js";
 import { logger } from "./logger.config.js";
 import { client, connectDB, db } from "./mongodb.config.js";
 import { connectToRedis } from "./redis.config.js";
@@ -19,4 +20,15 @@ const redisClient = await connectToRedis();
  *
  * `import { env, logger, redisClient } from '../config';`
  */
-export { env, NodeEnv, logger, redisClient, db, client, connectDB };
+export {
+  env,
+  NodeEnv,
+  logger,
+  redisClient,
+  db,
+  client,
+  connectDB,
+  s3Client,
+  snsClient,
+  sqsClient,
+};

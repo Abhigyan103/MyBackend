@@ -1,10 +1,10 @@
 import { Router } from "express";
 
-import { restrictFromPublic } from "@/middleware/auth.middleware.js";
 import {
+  restrictFromPublic,
   validate,
   ValidationSource,
-} from "@/middleware/validator.middleware.js";
+} from "@/middleware/index.js";
 
 import {
   changePassword,
@@ -15,6 +15,7 @@ import {
 } from "./auth.controller.js";
 import {
   changePasswordBodySchema,
+  deleteAccountBodySchema,
   loginBodySchema,
   registerBodySchema,
 } from "./auth.validators.js";
@@ -33,7 +34,14 @@ router.post(
   validate(changePasswordBodySchema, ValidationSource.BODY),
   changePassword,
 ); // /api/v1/auth/change-password
-router.delete("/delete-account", restrictFromPublic, deleteAccount); // /api/v1/auth/delete-account
+
+router.delete(
+  "/delete-account",
+  restrictFromPublic,
+  validate(deleteAccountBodySchema, ValidationSource.BODY),
+  deleteAccount,
+); // /api/v1/auth/delete-account
+
 router.get("/refresh-token", refreshToken); // /api/v1/auth/refresh-token
 
 export default router;

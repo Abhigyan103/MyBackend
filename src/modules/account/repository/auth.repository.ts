@@ -9,7 +9,7 @@ import type {
 import {
   HashedPasswordSchema,
   PasswordCollection,
-} from "@/models/password.model.js";
+} from "../models/password.model.js";
 
 export const createPassword = async (
   id: string,

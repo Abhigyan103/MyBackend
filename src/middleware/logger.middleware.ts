@@ -1,10 +1,11 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
+
 import { logger } from "@/config/index.js";
 
 export const requestLogger = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const startTime = process.hrtime();
   const timestamp = new Date().toISOString();
@@ -15,7 +16,6 @@ export const requestLogger = (
     headers: req.headers,
     query: req.query,
     body: req.body,
-    cookies: req.cookies,
     ip: req.ip,
     timestamp,
   });

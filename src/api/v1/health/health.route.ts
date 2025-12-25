@@ -1,27 +1,33 @@
 import { Router, type Request, type Response } from "express";
 import status from "http-status";
 
-import { db, redisClient } from "@/config/index.js";
+import { db, logger, redisClient } from "@/config/index.js";
 
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
+  let isMongoConnected = false;
+  let isRedisConnected = false;
+  let statusCode: number = status.FAILED_DEPENDENCY;
   // Check all services
-  const isMongoConnected = await db
-    .command({ ping: 1 })
-    .then(() => true)
-    .catch(() => false);
+  try {
+    isMongoConnected = await db
+      .command({ ping: 1 })
+      .then(() => true)
+      .catch(() => false);
 
-  const isRedisConnected = await redisClient
-    .ping()
-    .then(() => true)
-    .catch(() => false);
+    isRedisConnected = await redisClient
+      .ping()
+      .then(() => true)
+      .catch(() => false);
 
-  let statusCode: number = status.OK;
-
-  if (!(isMongoConnected && isRedisConnected)) {
-    statusCode = status.FAILED_DEPENDENCY;
+    if (isMongoConnected && isRedisConnected) {
+      statusCode = status.OK;
+    }
+  } catch (error) {
+    logger.error("Health check failed", error);
   }
+
   res.status(statusCode).send({
     isMongoConnected,
     isRedisConnected,

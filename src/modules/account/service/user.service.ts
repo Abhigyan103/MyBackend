@@ -7,11 +7,10 @@ import type {
   UpdateOptions,
 } from "mongodb";
 
-import type { IUser } from "@/models/user.model.js";
-import { UserSchemas } from "@/schema/index.js";
-
-import * as userRepository from "./user.repository.js";
-import type { IUserQuery } from "./user.types.js";
+import type { IUser } from "../models/user.model.js";
+import * as userRepository from "../repository/user.repository.js";
+import * as UserSchemas from "../schema/user.schema.js";
+import type { IUserQuery } from "../types/user.types.js";
 
 export const createUser = async (
   {

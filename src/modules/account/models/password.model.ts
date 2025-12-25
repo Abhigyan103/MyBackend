@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 import { db } from "@/config/index.js";
-import { USER_MODEL_CONSTANTS } from "@/utils/constants.js";
+
+import { USER_MODEL_CONSTANTS } from "../constants/constants.js";
 
 const { ID_LENGTH } = USER_MODEL_CONSTANTS;
 

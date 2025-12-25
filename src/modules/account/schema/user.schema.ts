@@ -9,11 +9,11 @@ export const UsernameSchema = z
   .max(20, "Username cannot exceed 20 characters.")
   .regex(
     /^[a-zA-Z0-9_]+$/,
-    "Username can only contain letters, numbers, and underscores."
+    "Username can only contain letters, numbers, and underscores.",
   )
   .refine(
     (val) => !val.startsWith("_") && !val.endsWith("_"),
-    "Username cannot start or end with an underscore."
+    "Username cannot start or end with an underscore.",
   );
 
 export const PhoneNumberSchema = z
@@ -21,7 +21,7 @@ export const PhoneNumberSchema = z
   .trim()
   .regex(
     /^(\+\d{1,3})?\d{6,15}$/,
-    "Must be a valid phone number format (6-15 digits, optional country code)."
+    "Must be a valid phone number format (6-15 digits, optional country code).",
   )
   .nullable()
   .optional()
@@ -94,7 +94,7 @@ export const EmailSchema = z
 
 export const RoleSchema = z.enum(
   ["user", "admin", "superadmin"],
-  "Invalid role"
+  "Invalid role",
 );
 export type Role = z.infer<typeof RoleSchema>;
 export const Roles = RoleSchema.enum;

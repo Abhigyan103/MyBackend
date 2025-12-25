@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import status from "http-status";
 
-import { getUser } from "@/modules/account/user.service.js";
+import { getUser } from "@/modules/account/service/user.service.js";
 
 export const allowInitializedUsersOnly = async (
   req: Request,

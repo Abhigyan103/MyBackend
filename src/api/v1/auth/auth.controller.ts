@@ -8,13 +8,18 @@ import {
   validateRefreshToken,
 } from "@/cache/refreshToken.cache.js";
 import { env, logger } from "@/config/index.js";
-import * as authService from "@/modules/account/auth.service.js";
+import * as authService from "@/modules/account/service/auth.service.js";
+import {
+  signToken,
+  verifyRefreshToken,
+  type JwtPayload,
+} from "@/modules/account/utils/jwt.js";
 import { CustomErrorTypes } from "@/types/error.types.js";
 import { CustomError, getZodFieldsFromError } from "@/utils/error.js";
-import { signToken, verifyRefreshToken, type JwtPayload } from "@/utils/jwt.js";
 
 import type {
   ChangePasswordRequestBody,
+  DeleteAccountRequestBody,
   LoginRequestBody,
   RegisterRequestBody,
 } from "./auth.validators.js";
@@ -213,17 +218,28 @@ export const refreshToken = async (
 };
 
 export const deleteAccount = async (
-  req: Request,
+  req: Request<{}, {}, DeleteAccountRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const userId = req.user!.id;
-    await authService.deleteUser(userId);
+    await authService.deleteUser({
+      userId: userId,
+      password: req.body.password,
+    });
     res.clearCookie("jwt");
     res.status(status.NO_CONTENT).send();
   } catch (error: any) {
     res.clearCookie("jwt");
+    if (error instanceof CustomError) {
+      next({
+        status: error.status,
+        message: error.message,
+        stack: error.stack,
+      });
+      return;
+    }
     next({
       status: status.INTERNAL_SERVER_ERROR,
       message: "Could not delete account.",
